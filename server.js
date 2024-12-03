@@ -11,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+app.get('/', (req, res) => {
+    res.json({ message: 'API is running!' });
+  });
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 
