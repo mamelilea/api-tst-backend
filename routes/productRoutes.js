@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db');
 
 // GET all products
-router.get('/', async (req, res) => {
+router.get('/',  async (req, res) => {
     try {
         const [products] = await db.query('SELECT * FROM products');
         res.json(products);
@@ -14,52 +14,26 @@ router.get('/', async (req, res) => {
 });
 
 // GET a product by ID
-// Di productRoutes.js
-// productRoutes.js
-router.get('/:id', async (req, res) => {
+router.get('/:id',  async (req, res) => {
     const id = req.params.id;
     try {
-        // Karena ID adalah char(36) UUID, gunakan query yang tepat
-        console.log("Executing query for ID:", id);
-        const [rows] = await db.query(
-            'SELECT * FROM products WHERE id = ? COLLATE utf8mb4_general_ci',
-            [id]
-        );
-        console.log("Query executed with ID:", id);
+        console.log("ID received:", id);
+        const [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
         console.log("Query result:", rows);
-
         if (rows.length === 0) {
             console.log("No product found with ID:", id);
-            return res.status(404).json({ 
-                message: "Product not found",
-                requestedId: id 
-            });
+            return res.status(404).json({ message: 'Product not found' });
         }
-
-        // Pastikan data yang dikembalikan sesuai dengan yang diharapkan frontend
-        const product = {
-            id: rows[0].id,
-            name: rows[0].name,
-            description: rows[0].description,
-            price: rows[0].price,
-            stock: rows[0].stock,
-            category: rows[0].category,
-            image_url: rows[0].image_url
-        };
-
-        console.log("Returning product data:", product);
-        res.json(product);
+        res.json(rows[0]);
     } catch (err) {
-        console.error("Error in GET /:id:", err);
-        res.status(500).json({ 
-            message: "Internal server error",
-            error: err.message 
-        });
+        console.error("Database query error:", err);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
+
 // POST a new product
-router.post('/', async (req, res) => {
+router.post('/',  async (req, res) => {
     const { name, description, price, stock, category, image_url } = req.body;
     try {
         const [result] = await db.query(
@@ -84,7 +58,7 @@ router.post('/', async (req, res) => {
 
 
 // PUT update a product by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id',  async (req, res) => {
     const { id } = req.params;
     const { name, description, price, stock, category, image_url } = req.body;
     try {
@@ -103,7 +77,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE a product by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',  async (req, res) => {
     const { id } = req.params;
     try {
         const [result] = await db.query('DELETE FROM products WHERE id = ?', [id]);
